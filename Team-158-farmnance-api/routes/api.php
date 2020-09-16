@@ -17,3 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+//sign up route
+Route::post('/farmer/signup/', 'FarmerController@store'); //save username form facebook to database
+
