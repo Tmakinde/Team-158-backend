@@ -11,7 +11,6 @@
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-
 -   [Simple, fast routing engine](https://laravel.com/docs/routing).
 
 
@@ -52,7 +51,7 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 
 -   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
->>>>>>> e7bf81d51e23b5e1a5e432b5638eba22b8a0b600
+>>>>>>>e7bf81d51e23b5e1a5e432b5638eba22b8a0b600
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
