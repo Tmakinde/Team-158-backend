@@ -19,5 +19,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 //sign up route
-Route::post('/farmer/signup/', 'FarmerController@store'); //save username form facebook to database
+Route::post('/farmer/signup/', 'FarmerController@store'); //save username from facebook to database
 
+Route::post('/investor/signup/', 'InvestorController@store'); //save username from facebook to database
