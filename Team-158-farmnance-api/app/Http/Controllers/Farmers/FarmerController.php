@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\DB;
+use App\Farmer;
 use Validator;
 
 
@@ -70,8 +71,25 @@ class FarmerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
+    // retrive a single farmer
     {
-        //
+        $farmer  = Farmer::find($id);
+        try {
+            
+            if($investor != null){
+                return response()->json([
+                    'farmerData' => $farmer,
+                ], 200);
+            }else{
+                return response()->json([
+                    'Message' => 'Not found',
+                ], 401);
+            }
+           
+        } catch (\Throwable $th) {
+            return response()->json(['Message' => 'Internal server Error'], 500);
+        }
+        
     }
 
     /**

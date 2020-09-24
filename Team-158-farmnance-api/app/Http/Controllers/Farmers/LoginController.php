@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Farmer;
+use App\DB;
 
 use Illuminate\Http\Request;
 

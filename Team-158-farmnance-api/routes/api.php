@@ -19,6 +19,23 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 //sign up route
-Route::post('/farmer/signup/', 'FarmerController@store'); //save username from facebook to database
+Route::post('/farmer/signup/', 'Farmers/FarmerController@store'); 
 
-Route::post('/investor/signup/', 'InvestorController@store'); //save username from facebook to database
+Route::post('/investor/signup/', 'investors/InvestorController@store'); 
+
+Route::group(['prefix' => 'farmer'], function (){
+
+    Route::post('/signup/', 'Farmers/FarmerController@store'); 
+    Route::post('/signin/', 'Farmers/LoginController@login'); 
+    Route::get('/{id}', 'Farmers/FarmerController@show');
+
+});
+
+Route::group(['prefix' => 'investor'], function (){
+
+    Route::post('/signup/', 'Investors/InvestorController@store'); 
+    Route::post('/signin/', 'Investors/LoginController@login');
+    Route::get('/{id}', 'Investors/InvestorController@show');
+    
+
+});

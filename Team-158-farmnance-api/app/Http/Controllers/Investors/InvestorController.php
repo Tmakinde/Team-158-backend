@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\DB;
 use Validator;
-
+use App\Investor;
 
 
 class InvestorController extends Controller
@@ -25,9 +25,9 @@ class InvestorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create( Request $request )
     {
-        //
+        
     }
 
     /**
@@ -69,9 +69,27 @@ class InvestorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function show($id)
+    // retrive a single investor
     {
-        //
+        $investor  = Investor::find($id);
+        try {
+            
+            if($investor != null){
+                return response()->json([
+                    'investorData' => $investor,
+                ], 200);
+            }else{
+                return response()->json([
+                    'Message' => 'Not found',
+                ], 401);
+            }
+           
+        } catch (\Throwable $th) {
+            return response()->json(['Message' => 'Internal server Error'], 500);
+        }
+        
     }
 
     /**

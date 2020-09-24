@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Investors;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\DB;
+use App\Investor;
 
 class LoginController extends Controller
 {
