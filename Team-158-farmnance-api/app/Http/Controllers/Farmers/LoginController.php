@@ -20,7 +20,9 @@ class LoginController extends Controller
                 ], 403);
             }
         } catch (Exception $e) {
-            return response()->json(['Message' => 'Internal server Error'], 500);
+            return response()->json([
+                'Message' => 'Internal server Error'
+            ], 500);
         }
         
     }
