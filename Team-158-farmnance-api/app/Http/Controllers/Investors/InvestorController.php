@@ -27,7 +27,39 @@ class InvestorController extends Controller
      */
     public function create( Request $request )
     {
+        try {
+            $validator = Validator::make($request->all(), [
+                'first_name' => ['required'],
+                'last_name' => ['required'],
+                'email' => ['required'],
+                'state' => ['required'],
+            ]);
+            if($validator->passes()){
+                $userStatus = $request->status;
+                $state = State::where('state', $request->state)->first();
+                $investor = Investor::where('username', $request->username)->first();
+                $investor->first_name = $request->first_name;
+                $investor->last_name = $request->last_name;
+                $investor->email = $request->email;
+                $investor->state_id = $state->id;
+                if($userStatus == 'conected'){
+                    $investor->status = 'online';
+                }else{
+                    $investor->status = 'offline';
+                };
+                return response()->json([
+                    'Message' => 'Information saved'
+                ], 200);
+            }else{
+                return response()->json([
+                    'Error' => withErrors($validator),
+                ], 500);
+            }     
+        } catch (Exception $e) {
+            return response()->json(['Message' => 'Internal server Error'], 500);
+        }
         
+
     }
 
     /**

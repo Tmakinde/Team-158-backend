@@ -28,7 +28,37 @@ class FarmerController extends Controller
      */
     public function create()
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                'first_name' => ['required'],
+                'last_name' => ['required'],
+                'email' => ['required'],
+                'state' => ['required'],
+            ]);
+            if($validator->passes()){
+                $userStatus = $request->status;
+                $state = State::where('state', $request->state)->first();
+                $farmer = Farmer::where('username', $request->username)->first();
+                $farmer->first_name = $request->first_name;
+                $farmer->last_name = $request->last_name;
+                $farmer->email = $request->email;
+                $farmer->state_id = $state->id;
+                if($userStatus == 'conected'){
+                    $farmer->status = 'online';
+                }else{
+                    $farmer->status = 'offline';
+                };
+                return response()->json([
+                    'Message' => 'Information saved'
+                ], 200);
+            }else{
+                return response()->json([
+                    'Error' => withErrors($validator),
+                ], 500);
+            }     
+        } catch (Exception $e) {
+            return response()->json(['Message' => 'Internal server Error'], 500);
+        }
     }
 
     /**
@@ -76,7 +106,7 @@ class FarmerController extends Controller
         $farmer  = Farmer::find($id);
         try {
             
-            if($investor != null){
+            if($farmer != null){
                 return response()->json([
                     'farmerData' => $farmer,
                 ], 200);
