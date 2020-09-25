@@ -11,7 +11,6 @@
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-<<<<<<< HEAD
 -   [Simple, fast routing engine](https://laravel.com/docs/routing).
 
 
@@ -31,7 +30,8 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 
 -   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-=======
+
+
 -   [Simple, fast routing engine](https://laravel.com/docs/routing).
 
 
@@ -51,7 +51,6 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 
 -   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
->>>>>>> e7bf81d51e23b5e1a5e432b5638eba22b8a0b600
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
@@ -67,16 +66,16 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 ### Premium Partners
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
+-   **[Vehikl](https://vehikl.com/)**
+-  **[Tighten Co.](https://tighten.co)**
+-   **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+-   **[64 Robots](https://64robots.com)**
+-   **[Cubet Techno Labs](https://cubettech.com)**
+-   **[Cyber-Duck](https://cyber-duck.co.uk)**
+-   **[Many](https://www.many.co.uk)**
+-   **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
+-   **[DevSquad](https://devsquad.com)**
+-   **[OP.GG](https://op.gg)**
 
 ## Contributing
 
