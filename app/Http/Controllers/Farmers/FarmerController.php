@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\DB;
+use App\Farmer;
 use Validator;
-use App\Investor;
 
 
-class InvestorController extends Controller
+
+class FarmerController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -25,7 +26,7 @@ class InvestorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create( Request $request )
+    public function create()
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -37,15 +38,15 @@ class InvestorController extends Controller
             if($validator->passes()){
                 $userStatus = $request->status;
                 $state = State::where('state', $request->state)->first();
-                $investor = Investor::where('username', $request->username)->first();
-                $investor->first_name = $request->first_name;
-                $investor->last_name = $request->last_name;
-                $investor->email = $request->email;
-                $investor->state_id = $state->id;
-                if($userStatus == 'conected'){
-                    $investor->status = 'online';
+                $farmer = Farmer::where('username', $request->username)->first();
+                $farmer->first_name = $request->first_name;
+                $farmer->last_name = $request->last_name;
+                $farmer->email = $request->email;
+                $farmer->state_id = $state->id;
+                if($userStatus == 'connected'){
+                    $farmer->status = 'online';
                 }else{
-                    $investor->status = 'offline';
+                    $farmer->status = 'offline';
                 };
                 return response()->json([
                     'Message' => 'Information saved'
@@ -58,8 +59,6 @@ class InvestorController extends Controller
         } catch (Exception $e) {
             return response()->json(['Message' => 'Internal server Error'], 500);
         }
-        
-
     }
 
     /**
@@ -73,14 +72,16 @@ class InvestorController extends Controller
         // save username to database
         $userStatus = $request->status;
         $username = $request->username;
+        $api_token = str_random(60);
         try {
             if(!empty($username) && ($userStatus == 'not_authorized' || $userStatus == 'unKnown')){
-                $checkUsername = DB::table('investors')->where('username', $username)->get();
+                $checkUsername = DB::table('farmers')->where('username', $username)->get();
                 if(!empty($checkUsername)){
-                    DB::table('investors')->insertGetId([
+                    DB::table('farmers')->insertGetId([
                         'username' => $username,
+                        'api_token' => $api_token,
                     ]);
-                    return response()->json(['Message' => 'Internal server Error'], 100); // status code means user should continue since their data exist and valid
+                    return response()->json(['Message' => 'Successfully Signup'], 100); // status code means user should continue since their data exist and valid
                 }else{
 
                     return response()->json(['Message' => 'User Already Exist'], 403); // user exist and forbidden to see the nextpage
@@ -101,16 +102,15 @@ class InvestorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-
     public function show($id)
-    // retrive a single investor
+    // retrive a single farmer
     {
-        $investor  = Investor::find($id);
+        $farmer  = Farmer::find($id);
         try {
             
-            if($investor != null){
+            if($farmer != null){
                 return response()->json([
-                    'investorData' => $investor,
+                    'farmerData' => $farmer,
                 ], 200);
             }else{
                 return response()->json([

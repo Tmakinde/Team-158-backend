@@ -10,15 +10,18 @@ class LoginController extends Controller
 {
     public function login(Request $request){
         $username = $request->username;
+        $api_token = str_random(60);
         $checkUsername = DB::table('farmers')->whereExists('username', $username)->get();
         try {
             if(!empty($checkUsername)){
+                DB::table('farmers')->whereExists('username', $username)->update('api_token', $api_token);
                 return response()->json([
+                    'api_token' => $api_token,
                     'Message' => 'User Succesfully login'
                 ], 200);
             }else{
                 return response()->json([
-                    'Message' => 'You are not authorize to signin because you the username does not exist'
+                    'Message' => 'You are not authorize to signin because the username does not exist'
                 ], 403);
             }
         } catch (Exception $e) {
@@ -26,6 +29,11 @@ class LoginController extends Controller
                 'Message' => 'Internal server Error'
             ], 500);
         }
-        
+      
     }
 }
+
+
+
+
+

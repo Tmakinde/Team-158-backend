@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\DB;
-use App\Farmer;
 use Validator;
+use App\Investor;
 
 
-
-class FarmerController extends Controller
+class InvestorController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -26,7 +25,7 @@ class FarmerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create( Request $request )
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -38,15 +37,15 @@ class FarmerController extends Controller
             if($validator->passes()){
                 $userStatus = $request->status;
                 $state = State::where('state', $request->state)->first();
-                $farmer = Farmer::where('username', $request->username)->first();
-                $farmer->first_name = $request->first_name;
-                $farmer->last_name = $request->last_name;
-                $farmer->email = $request->email;
-                $farmer->state_id = $state->id;
+                $investor = Investor::where('username', $request->username)->first();
+                $investor->first_name = $request->first_name;
+                $investor->last_name = $request->last_name;
+                $investor->email = $request->email;
+                $investor->state_id = $state->id;
                 if($userStatus == 'conected'){
-                    $farmer->status = 'online';
+                    $investor->status = 'online';
                 }else{
-                    $farmer->status = 'offline';
+                    $investor->status = 'offline';
                 };
                 return response()->json([
                     'Message' => 'Information saved'
@@ -59,6 +58,8 @@ class FarmerController extends Controller
         } catch (Exception $e) {
             return response()->json(['Message' => 'Internal server Error'], 500);
         }
+        
+
     }
 
     /**
@@ -74,9 +75,9 @@ class FarmerController extends Controller
         $username = $request->username;
         try {
             if(!empty($username) && ($userStatus == 'not_authorized' || $userStatus == 'unKnown')){
-                $checkUsername = DB::table('farmers')->where('username', $username)->get();
+                $checkUsername = DB::table('investors')->where('username', $username)->get();
                 if(!empty($checkUsername)){
-                    DB::table('farmers')->insertGetId([
+                    DB::table('investors')->insertGetId([
                         'username' => $username,
                     ]);
                     return response()->json(['Message' => 'Internal server Error'], 100); // status code means user should continue since their data exist and valid
@@ -100,15 +101,16 @@ class FarmerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function show($id)
-    // retrive a single farmer
+    // retrive a single investor
     {
-        $farmer  = Farmer::find($id);
+        $investor  = Investor::find($id);
         try {
             
-            if($farmer != null){
+            if($investor != null){
                 return response()->json([
-                    'farmerData' => $farmer,
+                    'investorData' => $investor,
                 ], 200);
             }else{
                 return response()->json([
@@ -142,7 +144,8 @@ class FarmerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $investor  = Investor::find($id);
+        
     }
 
     /**

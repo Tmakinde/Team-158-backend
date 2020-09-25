@@ -23,7 +23,7 @@ Route::post('/farmer/signup/', 'Farmers/FarmerController@store');
 
 Route::post('/investor/signup/', 'investors/InvestorController@store'); 
 
-Route::group(['prefix' => 'farmer'], function (){
+Route::group(['prefix' => 'farmer', 'middleware' => 'auth:api'], function (){
 
     Route::post('/signup/', 'Farmers/FarmerController@store'); 
     Route::post('/signin/', 'Farmers/LoginController@login'); 
@@ -31,7 +31,7 @@ Route::group(['prefix' => 'farmer'], function (){
     Route::post('/mydata/', 'Farmers/FarmerController@create');
 });
 
-Route::group(['prefix' => 'investor'], function (){
+Route::group(['prefix' => 'investor', 'middleware' => 'auth:api'], function (){
 
     Route::post('/signup/', 'Investors/InvestorController@store'); 
     Route::post('/signin/', 'Investors/LoginController@login');
