@@ -1,3 +1,38 @@
+#Team-158-Backend-API Installation guide
+
+Install composer and laravel 7
+
+fork the repository and clone
+
+git remote add upstream <https://github.com/BuildForSDGCohort2/Team-158-backend.git>
+
+git checkout Develop
+
+git pull upstream Develop
+
+run command "composer install"
+
+php artisan key:generate
+
+php artisan serve
+
+To push after working on the repo
+
+git add .
+
+git commit -m "your commit message"
+
+git pull upstream Develop
+
+git push origin Develop
+
+Make sure there is no conflict
+
+Create pull request
+
+Add the description of what you have done in your pull request
+
+No live link yet
 <p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
 
 <p align="center">
