@@ -1,37 +1,53 @@
-#Team-158-Backend-API Installation guide
 
-Install composer and laravel 7
 
-fork the repository and clone
+-   Database agnostic [schema migrations](https://laravel.com/docs/migrations).
 
-git remote add upstream <https://github.com/BuildForSDGCohort2/Team-158-backend.git>
 
-git checkout Develop
+-   [Robust background job processing](https://laravel.com/docs/queues).
 
-git pull upstream Develop
 
-run command "composer install"
+-   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-php artisan key:generate
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-php artisan serve
+## Learning Laravel
 
-To push after working on the repo
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-git add .
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-git commit -m "your commit message"
+## Laravel Sponsors
 
-git pull upstream Develop
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
 
-git push origin Develop
+### Premium Partners
 
-Make sure there is no conflict
+-   **[Vehikl](https://vehikl.com/)**
+-  **[Tighten Co.](https://tighten.co)**
+-   **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+-   **[64 Robots](https://64robots.com)**
+-   **[Cubet Techno Labs](https://cubettech.com)**
+-   **[Cyber-Duck](https://cyber-duck.co.uk)**
+-   **[Many](https://www.many.co.uk)**
+-   **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
+-   **[DevSquad](https://devsquad.com)**
+-   **[OP.GG](https://op.gg)**
 
-Create pull request
+## Contributing
 
-Add the description of what you have done in your pull request
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-No live link yet
+## Code of Conduct
+
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+
+## License
+
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c051671a2c7f49d1946612671410f36f)](https://app.codacy.com/gh/BuildForSDGCohort2/Team-158-backend?utm_source=github.com&utm_medium=referral&utm_content=BuildForSDGCohort2/Team-158-backend&utm_campaign=Badge_Grade_Settings)
