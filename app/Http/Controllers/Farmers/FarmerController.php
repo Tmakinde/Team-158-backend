@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Farmers;
 
 use Illuminate\Http\Request;
 use App\DB;
 use App\Farmer;
 use Validator;
-
+use App\Http\Controllers\Controller;
 
 
 class FarmerController extends Controller

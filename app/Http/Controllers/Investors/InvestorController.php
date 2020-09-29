@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Investors;
 
 use Illuminate\Http\Request;
 use App\DB;
 use Validator;
 use App\Investor;
-
+use App\Http\Controllers\Controller;
 
 class InvestorController extends Controller
 {

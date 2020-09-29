@@ -23,19 +23,17 @@ Route::post('/farmer/signup/', 'Farmers/FarmerController@store');
 
 Route::post('/investor/signup/', 'investors/InvestorController@store'); 
 
-Route::group(['prefix' => 'farmer', 'middleware' => 'auth:api'], function (){
-
-    Route::post('/signup/', 'Farmers/FarmerController@store'); 
-    Route::post('/signin/', 'Farmers/LoginController@login'); 
-    Route::get('/{id}', 'Farmers/FarmerController@show');
-    Route::post('/mydata/', 'Farmers/FarmerController@create');
+Route::group(['prefix' => 'farmer'], function (){
+    Route::post('/signup/', 'Farmers\FarmerController@store'); 
+    Route::post('/signin/', 'Farmers\LoginController@login'); 
+    Route::get('/{id}', 'Farmers\FarmerController@show');
+    Route::post('/mydata/', 'Farmers\FarmerController@create');
 });
 
-Route::group(['prefix' => 'investor', 'middleware' => 'auth:api'], function (){
-
-    Route::post('/signup/', 'Investors/InvestorController@store'); 
-    Route::post('/signin/', 'Investors/LoginController@login');
-    Route::get('/{id}', 'Investors/InvestorController@show');
-    Route::post('/mydata/', 'Investors/InvestorController@create');
+Route::group(['prefix' => 'investor'], function (){
+    Route::post('/signup/', 'Investors\InvestorController@store'); 
+    Route::post('/signin/', 'Investors\LoginController@login');
+    Route::get('/{id}', 'Investors\InvestorController@show');
+    Route::post('/mydata/', 'Investors\InvestorController@create');
 
 });
