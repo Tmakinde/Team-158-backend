@@ -29,6 +29,7 @@ Route::group(['prefix' => 'farmer'], function (){
     Route::get('/{id}', 'Farmers\FarmerController@show');
     Route::post('/mydata/', 'Farmers\FarmerController@create');
     Route::get('/delete/{id}', 'Farmers\FarmerController@destroy');
+    Route::get('/myinvestors/{id}', 'Farmers\FarmerController@listInvestor');
 });
 
 Route::group(['prefix' => 'investor'], function (){
@@ -37,4 +38,5 @@ Route::group(['prefix' => 'investor'], function (){
     Route::get('/{id}', 'Investors\InvestorController@show');
     Route::post('/mydata/', 'Investors\InvestorController@create');
     Route::get('/delete/{id}', 'Investors\InvestorController@destroy');
+    Route::get('/myfarmers/{id}', 'Investors\InvestorController@listFarmer');
 });

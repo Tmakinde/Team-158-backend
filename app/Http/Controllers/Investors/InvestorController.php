@@ -168,4 +168,23 @@ class InvestorController extends Controller
             return response()->json(['Message' => 'Internal server Error'], 500);
         }
     }
+
+    public function listFarmer($id)
+    {
+        try{
+                $investor = Investor::find($id);
+                if(!empty($investor)){
+                $farmer = $investor->farmers;
+                return response()->json([
+                    'Message' => $farmer
+                ], 200);
+                }else{
+                    return response()->json(['Message' => 'You do not have a farmer yet'], 200);
+                }
+
+        }catch (Exception $e) {
+            return response()->json(['Message' => 'Internal server Error'], 500);
+        }
+    }
+    
 }
