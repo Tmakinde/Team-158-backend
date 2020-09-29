@@ -156,6 +156,16 @@ class InvestorController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try{
+            $investor = Investor::find($id);
+            if(!empty($investor)){
+                $investor->delete();
+                return response()->json(['Message' => 'Investor successfully deleted'], 200);
+            }else{
+                return response()->json(['Message' => 'Investor does not exist'], 200);
+            }
+        }catch (Exception $e) {
+            return response()->json(['Message' => 'Internal server Error'], 500);
+        }
     }
 }

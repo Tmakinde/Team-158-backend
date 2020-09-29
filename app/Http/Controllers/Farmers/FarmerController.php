@@ -118,7 +118,7 @@ class FarmerController extends Controller
                 ], 401);
             }
            
-        } catch (\Throwable $th) {
+        } catch (Exception $e) {
             return response()->json(['Message' => 'Internal server Error'], 500);
         }
         
@@ -155,6 +155,16 @@ class FarmerController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try{
+            $farmer = Farmer::find($id);
+            if(!empty($farmer)){
+                $farmer->delete();
+                return response()->json(['Message' => 'Farmer successfully deleted'], 200);
+            }else{
+                return response()->json(['Message' => 'Farmer does not exist'], 200);
+            }
+        }catch (Exception $e) {
+            return response()->json(['Message' => 'Internal server Error'], 500);
+        }
     }
 }
