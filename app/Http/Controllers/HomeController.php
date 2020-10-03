@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\State;
 
 class HomeController extends Controller
 {
@@ -25,4 +26,27 @@ class HomeController extends Controller
     {
         return view('home');
     }
+
+    public function state(Request $request)
+    {try {
+       
+        if($request->state != null){
+            $state = new State;
+            $state = $request->state;
+            $state->save();
+            return response()->json([
+                'success' => "State successfully added",
+            ], 200);
+        }else{
+            return response()->json([
+                'Error' => "provide a valid state name",
+            ], 401);
+        }     
+    } catch (Exception $e) {
+        return response()->json(['Message' => 'Internal server Error'], 500);
+
+    }
+       
+    }
+
 }

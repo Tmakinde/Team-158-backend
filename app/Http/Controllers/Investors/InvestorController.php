@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\DB;
 use Validator;
 use App\Investor;
+use App\Farmer;
 use App\Http\Controllers\Controller;
 
 class InvestorController extends Controller
@@ -29,20 +30,26 @@ class InvestorController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'first_name' => ['required'],
-                'last_name' => ['required'],
+                'fname' => ['required'],
+                'lname' => ['required'],
                 'email' => ['required'],
                 'state' => ['required'],
+                'businessProof' => ['required'],
+                'insured' => ['required'],
             ]);
             if($validator->passes()){
                 $userStatus = $request->status;
                 $state = State::where('state', $request->state)->first();
-                $investor = Investor::where('username', $request->username)->first();
-                $investor->first_name = $request->first_name;
-                $investor->last_name = $request->last_name;
+                $investor = Investor::where('username', $request->uid)->first();
+                $investor->first_name = $request->fname;
+                $investor->last_name = $request->lname;
                 $investor->email = $request->email;
                 $investor->state_id = $state->id;
-                if($userStatus == 'conected'){
+              /*  DB::table('farmers_credential')->insertGetId([
+                    'insurance_paper' => $request->insured,
+                    'cbr' => 'businessProof'
+                ]);*/
+                if($userStatus == 'connected'){
                     $investor->status = 'online';
                 }else{
                     $investor->status = 'offline';
@@ -72,9 +79,9 @@ class InvestorController extends Controller
     {
         // save username to database
         $userStatus = $request->status;
-        $username = $request->username;
+        $username = $request->uid;
         try {
-            if(!empty($username) && ($userStatus == 'not_authorized' || $userStatus == 'unKnown')){
+            if($username != null && ($userStatus == 'not_authorized' || $userStatus == 'unKnown')){
                 $checkUsername = DB::table('investors')->where('username', $username)->get();
                 if(!empty($checkUsername)){
                     DB::table('investors')->insertGetId([
@@ -102,10 +109,11 @@ class InvestorController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function show($id)
+    public function show(Request $request)
     // retrive a single investor
     {
-        $investor  = Investor::find($id);
+        $uid = $request->uid;
+        $investor  = Investor::find($uid);
         try {
             
             if($investor != null){
@@ -144,7 +152,7 @@ class InvestorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $investor  = Investor::find($id);
+       // $investor  = Investor::find($id);
         
     }
 
@@ -154,11 +162,12 @@ class InvestorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
         try{
-            $investor = Investor::find($id);
-            if(!empty($investor)){
+            $uid = $request->uid;
+            $investor = Investor::find($uid);
+            if($investor != null){
                 $investor->delete();
                 return response()->json(['Message' => 'Investor successfully deleted'], 200);
             }else{
@@ -169,18 +178,19 @@ class InvestorController extends Controller
         }
     }
 
-    public function listFarmer($id)
+    public function listFarmer(Request $request)
     {
         try{
-                $investor = Investor::find($id);
-                if(!empty($investor)){
-                $farmer = $investor->farmers;
-                return response()->json([
-                    'Message' => $farmer
-                ], 200);
-                }else{
-                    return response()->json(['Message' => 'You do not have a farmer yet'], 200);
-                }
+            $uid = $request->uid;
+            $investor = Investor::find($uid);
+            if($investor != null){
+            $farmer = $investor->farmers;
+            return response()->json([
+                'Message' => $farmer
+            ], 200);
+            }else{
+                return response()->json(['Message' => 'You do not have a farmer yet'], 200);
+            }
 
         }catch (Exception $e) {
             return response()->json(['Message' => 'Internal server Error'], 500);
