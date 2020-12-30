@@ -4,29 +4,35 @@ namespace App\Http\Controllers\Investors;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\DB;
+use DB;
 use App\Investor;
+use Illuminate\support\Facades\Auth;
 
 class LoginController extends Controller
 {
+    public function __construct(){
+        $this->middleware('guest:investors');
+    }
+
     public function login(Request $request){
         $username = $request->username;
-        $api_token = str_random(60);
-        $checkUsername = DB::table('investors')->whereExists('username', $username)->get();
+        //$api_token = str_random(60);
+        $checkUsername = Investor::where('username', $username)->first();
         try {
-            if(!empty($checkUsername)){
-                DB::table('investors')->whereExists('username', $username)->update('api_token', $api_token);
+            if ($checkUsername){
+                $api_token = Auth::guard('investors')->login($checkUsername);
                 return response()->json([
                     'api_token' => $api_token,
-                    'Message' => 'User Succesfully login'
+                    'message' => 'User Succesfully login'
                 ], 200);
+
             }else{
                 return response()->json([
-                    'Message' => 'You are not authorize to signin because you have not signin'
+                    'message' => 'You are not authorize to signin because the username does not exist'
                 ], 403);
             }
         } catch (Exception $e) {
-            return response()->json(['Message' => 'Internal server Error'], 500);
+            return response()->json(['message' => 'Internal server Error'], 500);
         }
         
     }

@@ -14,7 +14,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth:farmers');
     }
 
     /**
@@ -22,30 +22,28 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
-    {
-        return view('home');
-    }
+
 
     public function state(Request $request)
-    {try {
-       
-        if($request->state != null){
-            $state = new State;
-            $state = $request->state;
-            $state->save();
-            return response()->json([
-                'success' => "State successfully added",
-            ], 200);
-        }else{
-            return response()->json([
-                'Error' => "provide a valid state name",
-            ], 401);
-        }     
-    } catch (Exception $e) {
-        return response()->json(['Message' => 'Internal server Error'], 500);
+    {
+        try {
+            $checker = State::where('state',$request->state)->first();
+            if($request->state != null && $checker == null){
+                $state = new State;
+                $state->state = $request->state;
+                $state->save();
+                return response()->json([
+                    'success' => "State successfully added",
+                ], 200);
+            }else{
+                return response()->json([
+                    'error' => "provide a valid state name",
+                ], 401);
+            }     
+        } catch (\Tymon\JWTAuth\Exceptions\userNotDefinedException $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
 
-    }
+        }
        
     }
 

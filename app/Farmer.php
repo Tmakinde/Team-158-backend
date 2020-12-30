@@ -3,8 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
-class Farmer extends Model
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+class Farmer extends Authenticatable implements JWTSubject
 {
     protected $fillable = [
         'first_name', 'last_name', 'email', 'username','status', 'logindate', 'state_id',
@@ -14,4 +15,11 @@ class Farmer extends Model
         return $this->belongsTo(Investor::class);
     }
 
+    public function getJWTIdentifier(){
+        return $this->getkey();
+    }
+
+    public function getJWTCustomClaims(){
+        return [];
+    }
 }

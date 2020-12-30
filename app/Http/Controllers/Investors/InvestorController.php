@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Investors;
 
 use Illuminate\Http\Request;
-use App\DB;
+use DB;
 use Validator;
 use App\Investor;
 use App\Farmer;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+
 
 class InvestorController extends Controller
 {
@@ -16,9 +18,9 @@ class InvestorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function __construct()
     {
-        //
+        $this->middleware('auth:investors')->except('store');
     }
 
     /**
@@ -81,23 +83,33 @@ class InvestorController extends Controller
         $userStatus = $request->status;
         $username = $request->uid;
         try {
-            if($username != null && ($userStatus == 'not_authorized' || $userStatus == 'unKnown')){
-                $checkUsername = DB::table('investors')->where('username', $username)->get();
-                if(!empty($checkUsername)){
+            if($username != null && ($userStatus != 'not_authorized' || $userStatus != 'unKnown')){
+                $checkUsernameForFarmer = DB::table('farmers')->where('username', $username)->first();
+                $checkUsernameForInvestor = Investor::where('username', $username)->first();
+
+                if($checkUsernameForInvestor == null && $checkUsernameForFarmer == null){
                     DB::table('investors')->insertGetId([
                         'username' => $username,
                     ]);
-                    return response()->json(['Message' => 'Internal server Error'], 100); // status code means user should continue since their data exist and valid
+                    $checkUsernameForInvestor = Investor::where('username', $username)->first();
+                    $api_token = Auth::guard('investors')->login($checkUsernameForInvestor);
+                    $investor = Investor::where('username',$username)->first();
+                    $investor->api_token = $api_token;
+                    $investor->save();
+                    return response()->json([
+                        'api_token' => $api_token,
+                        'message' => 'user successfully signup'], 200); // status code means user should continue since their data exist and valid
                 }else{
 
-                    return response()->json(['Message' => 'User Already Exist'], 403); // user exist and forbidden to see the nextpage
+                    return response()->json(['message' => 'You Already Exist as a Farmer or Investor'], 403); // user exist and forbidden to see the nextpage
                 }
                 
+                
             }else{
-                return response()->json(['Message' => 'You are not register with Facebook'], 401); // status code means user should continue since their data exist and valid
+                return response()->json(['message' => 'You are not authorize by facebook'], 401); // status code means user should continue since their data exist and valid
             }
         } catch (Exception $e) {
-            return response()->json(['Message' => 'Internal server Error'], 500);
+            return response()->json(['message' => 'Internal server Error'], 500);
         }
 
     }

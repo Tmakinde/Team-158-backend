@@ -42,9 +42,21 @@ return [
         ],
 
         'api' => [
-            'driver' => 'token',
+            'driver' => 'jwt',
             'provider' => 'users',
             'hash' => false,
+        ],
+
+        'farmers' => [
+            'driver' => 'jwt',
+            'provider' => 'farmers',
+            
+        ],
+
+        'investors' => [
+            'driver' => 'jwt',
+            'provider' => 'investors',
+            
         ],
     ],
 
@@ -69,6 +81,14 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\User::class,
+        ],
+        'farmers' => [
+            'driver' => 'eloquent',
+            'model' => App\Farmer::class,
+        ],
+        'investors' => [
+            'driver' => 'eloquent',
+            'model' => App\Investor::class,
         ],
 
         // 'users' => [

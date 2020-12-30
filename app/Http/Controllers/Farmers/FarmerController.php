@@ -1,13 +1,15 @@
 <?php
 
 namespace App\Http\Controllers\Farmers;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\DB;
+use DB;
 use App\Farmer;
 use App\Investor;
+use App\State;
 use Validator;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Str;
 
 
 class FarmerController extends Controller
@@ -17,6 +19,12 @@ class FarmerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function __construct()
+    {
+        $this->middleware('auth:farmers')->except('store');
+    }
+
     public function index()
     {
         //
@@ -34,8 +42,7 @@ class FarmerController extends Controller
                 'f_name' => ['required'],
                 'l_name' => ['required'],
                 'email' => ['required'],
-                'state' => ['required'],
-                
+                'state' => ['required'],   
             ]);
             if($validator->passes()){
                 $uid = $request->uid;
@@ -43,7 +50,7 @@ class FarmerController extends Controller
                 $state = State::where('state', $request->state)->first();
                 $farmer = Farmer::where('username', $request->uid)->first();
                 $farmer->first_name = $request->f_name;
-                $farmer->last_name = $request->l_name;
+                $farmer->lastname = $request->l_name;
                 $farmer->email = $request->email;
                 $farmer->state_id = $state->id;
                 if($userStatus == 'connected'){
@@ -51,6 +58,7 @@ class FarmerController extends Controller
                 }else{
                     $farmer->status = 'offline';
                 };
+                $farmer->save();
                 return response()->json([
                     'Message' => 'Information saved'
                 ], 200);
@@ -77,23 +85,32 @@ class FarmerController extends Controller
         //uid
         $userStatus = $request->status;
         $username = $request->uid;
-        $api_token = str_random(60);
+        //$api_token = Str::random(60);
         try {
-            if(!empty($username) && ($userStatus == 'not_authorized' || $userStatus == 'unKnown')){
-                $checkUsername = DB::table('farmers')->where('username', $username)->get();
-                if(!empty($checkUsername)){
+            if($username != null && ($userStatus != 'not_authorized' || $userStatus != 'unKnown')){
+                $checkUsernameForFarmer = Farmer::where('username', $username)->get();
+                $checkUsernameForInvestor = Investor::where('username', $username)->get();
+                if($checkUsernameForInvestor->isEmpty() || $checkUsernameForFarmer->isEmpty() ){
+                    
                     DB::table('farmers')->insertGetId([
                         'username' => $username,
-                        'api_token' => $api_token,
                     ]);
-                    return response()->json(['Message' => 'Successfully Signup'], 100); // status code means user should continue since their data exist and valid
+                    $checkUsernameForFarmer = Farmer::where('username', $username)->first();
+                    $api_token = Auth::guard('farmers')->login($checkUsernameForFarmer);
+                    $farmer = Farmer::where('username',$username)->first();
+                    $farmer->api_token = $api_token;
+                    $farmer->save();
+                    
+                    return response()->json([
+                        'api_token' => $api_token,
+                        'message' => 'User Successfully Signup'], 200); // status code means user should continue since their data exist and valid
                 }else{
 
-                    return response()->json(['Message' => 'User Already Exist'], 403); // user exist and forbidden to see the nextpage
+                    return response()->json(['Message' => 'You Already Exist as a Farmer or Investor'], 403); // user exist and forbidden to see the nextpage
                 }
                 
             }else{
-                return response()->json(['Message' => 'You are not signin or signup with Facebook '], 401); // status code means user should continue since their data exist and valid
+                return response()->json(['Message' => 'You are not authorize by facebook'], 401); // status code means user should continue since their data exist and valid
             }
         } catch (Exception $e) {
             return response()->json(['Message' => 'Internal server Error'], 500);
