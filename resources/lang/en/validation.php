@@ -133,6 +133,47 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+        'data' => [
+            'required' => "You must fill this",
+            "array" => "It has to be an array or object"
+        ],
+        '*.type' => [
+            "required" => "Type incorrect",
+            "in" => "Invalid type"
+        ],
+        "*.attributes" => [
+            "required" => "You must fill this",
+            "array" => "It has to be an array or object"
+        ],
+        "*.attributes.f_name" => [
+            'required' => "You must fill this",
+            "string" => "It has to be string"
+        ],
+        "*.attributes.l_name" => [
+            'required' => "You must fill this",
+            "string" => "It has to be string"
+        ],
+        "*.attributes.email" => [
+            'required' => "You must fill this",
+            "email" => "Invalid email address",
+            "unique" => "Email has been used",
+        ],
+        '*.attributes.state' => [
+            'required' => "You must fill this",
+            "string" => "Invalid state name"
+        ],
+        '*.attributes.status' => [
+            'required' => "You must fill this",
+            "string" => "Invalid status"
+        ],
+        '*.attributes.uid'=> [
+            'required' => "You must fill this",
+            "string" => "it has to be a string",
+            "unique" => "Uid has been used",
+        ],
+        'attributes' => [
+            "data.attributes.uid" => "uid"
+        ],
     ],
 
     /*
@@ -145,7 +186,10 @@ return [
     | of "email". This simply helps us make our message more expressive.
     |
     */
+    
+    'attributes' => [
+        "data.attributes.uid" => "uid"
+    ],
 
-    'attributes' => [],
 
 ];

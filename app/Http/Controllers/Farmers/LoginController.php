@@ -15,34 +15,32 @@ class LoginController extends Controller
     }
 
     public function login(Request $request){
-        $username = $request->username;
-        $credentials = compact('username');
-        
-        //$api_token = Str::random(60);
-
-        $checkUsername = Farmer::where('username', $username)->first();
+        $userStatus = $request->status;
+        $username = $request->uid;
+        $checkUsername = Farmer::where('uid', $username)->first();
         try {
-            //Auth::guard('farmers')->attempt($credentials)
-            if ($checkUsername){
-                $api_token = Auth::guard('farmers')->login($checkUsername);
-                return response()->json([
-                    'api_token' => $api_token,
-                    'message' => 'User Succesfully login'
-                ], 200);
+            if($userStatus == "connected"){
 
-            }
+                if ($checkUsername){
+                    $api_token = Auth::guard('farmers')->login($checkUsername);
+                    return response()->json([
+                        'api_token' => $api_token,
+                        'message' => 'User Succesfully login'
+                    ], 200);
+                    
+                }else{
+                    return response()->json([
+                        'message' => 'You need to fill the Farmer data before authorization'
+                    ], 401);
+                    
+                }
 
-           /* if(!empty($checkUsername)){
-                DB::table('farmers')->whereExists('username', $username)->update('api_token', $api_token);
+            }else{
                 return response()->json([
-                    'api_token' => $api_token,
-                    'Message' => 'User Succesfully login'
-                ], 200);
-            }*/else{
-                return response()->json([
-                    'Message' => 'You are not authorize to signin because the username does not exist'
+                    'message' => 'Please connect to facebook'
                 ], 403);
             }
+            
         } catch (Exception $e) {
             return response()->json([
                 'Message' => 'Internal server Error'

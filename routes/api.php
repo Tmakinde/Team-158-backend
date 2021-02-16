@@ -19,20 +19,23 @@ use Illuminate\Support\Facades\Route;
 });*/
 
 Route::post('/state/', 'HomeController@state');
-Route::group(['prefix' => 'farmer'], function (){
+Route::post('/csv/', 'HomeController@csv');
+Route::apiResource('v1/farmers', 'Farmers\FarmerController');
+Route::group(['prefix' => 'v1/farmers'], function (){
+
     Route::post('/signup/', 'Farmers\FarmerController@store'); 
     Route::post('/signin/', 'Farmers\LoginController@login');
-    Route::get('/', 'Farmers\FarmerController@show');
-    Route::post('/createdata/', 'Farmers\FarmerController@create');
-    Route::post('/delete', 'Farmers\FarmerController@destroy');
-    Route::get('/myinvestors', 'Farmers\FarmerController@listInvestor');
+    Route::get('/{uid}/myinvestors', 'Farmers\FarmerController@listInvestor');
+    Route::delete('/{uid}/delete', 'Farmers\FarmerController@destroy');
+
 });
 
-Route::group(['prefix' => 'investor'], function (){
+Route::apiResource('v2/investors', 'Investors\InvestorController');
+Route::group(['prefix' => 'v2/investors'], function (){
+
     Route::post('/signup/', 'Investors\InvestorController@store'); 
     Route::post('/signin/', 'Investors\LoginController@login');
-    Route::get('/', 'Investors\InvestorController@show');
-    Route::post('/createData', 'Investors\InvestorController@create');
-    Route::post('/delete', 'Investors\InvestorController@destroy');
-    Route::get('/myfarmers', 'Investors\InvestorController@listFarmer');
+    Route::get('/{uid}/myfarmers', 'Investors\InvestorController@listFarmer');
+    Route::delete('/{uid}/delete', 'Investors\InvestorController@destroy');
+
 });

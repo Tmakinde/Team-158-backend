@@ -14,7 +14,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:farmers');
+        $this->middleware('auth')->except('csv');
     }
 
     /**
@@ -23,6 +23,9 @@ class HomeController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
 
+    public function index(){
+        return view('home');
+    }
 
     public function state(Request $request)
     {
@@ -46,5 +49,38 @@ class HomeController extends Controller
         }
        
     }
+    // posted test for csv result;
+    public function csv(Request $request){
+        $csv = $request->csv;
+        //dd(explode(',', $request->header('Accept')));
+        
+        $allowKeys = ['first_name','last_name'];
+
+        $FNandLN = array_filter(
+            $csv,
+            function ($key) use ($allowKeys) {
+                return in_array($key, $allowKeys);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+
+        $listOfNames = [[]];
+
+        $count = count($FNandLN);
+        for ($i=0; $i < $count; $i++) { 
+            
+            foreach ($FNandLN as $key => $value) {
+                $listOfName[$i][$key] = $value[$i];
+                
+            }
+
+        }
+        
+        return response()->json([
+            'tokens' => 'rreRpt1fGkKIlHmigZyfDJ9m7Us/Ga7kat0rGo4hFBIIlHmigZyfDJ9m7Us',
+            'csv' => $listOfName,
+        ]);
+    }
+
 
 }

@@ -9,8 +9,9 @@ use App\Investor;
 use App\State;
 use Validator;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\FarmersResource;
+use App\Http\Requests\CreateFarmerRequest;
 use Illuminate\Support\Str;
-
 
 class FarmerController extends Controller
 {
@@ -27,7 +28,8 @@ class FarmerController extends Controller
 
     public function index()
     {
-        //
+        $farmer = Farmer::all();
+        return FarmersResource::collection($farmer);
     }
 
     /**
@@ -37,40 +39,7 @@ class FarmerController extends Controller
      */
     public function create(Request $request)
     {
-        try {
-            $validator = Validator::make($request->all(), [
-                'f_name' => ['required'],
-                'l_name' => ['required'],
-                'email' => ['required'],
-                'state' => ['required'],   
-            ]);
-            if($validator->passes()){
-                $uid = $request->uid;
-                $userStatus = $request->status;
-                $state = State::where('state', $request->state)->first();
-                $farmer = Farmer::where('username', $request->uid)->first();
-                $farmer->first_name = $request->f_name;
-                $farmer->lastname = $request->l_name;
-                $farmer->email = $request->email;
-                $farmer->state_id = $state->id;
-                if($userStatus == 'connected'){
-                    $farmer->status = 'online';
-                }else{
-                    $farmer->status = 'offline';
-                };
-                $farmer->save();
-                return response()->json([
-                    'Message' => 'Information saved'
-                ], 200);
-            }else{
-                return response()->json([
-                    'Error' => withErrors($validator),
-                ], 500);
-            }     
-        } catch (Exception $e) {
-            return response()->json(['Message' => 'Internal server Error'], 500);
-
-        }
+        
     }
 
     /**
@@ -79,43 +48,70 @@ class FarmerController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+    public $customAttributes = [
+        'data' => 'data',
+        '*.type' => 'type',
+        '*.attributes' => 'atttributes',
+        '*.attributes.f_name' => 'First Name',
+        '*.attributes.l_name' => 'Last Name',
+        '*.attributes.email' => 'Email',
+        '*.attributes.state' => 'State',
+        '*.attributes.status' => 'Status',
+        '*.attributes.uid'=> 'Unique Id',
+    ];
+
     public function store(Request $request)
     {
-        // save username to database
-        //uid
-        $userStatus = $request->status;
-        $username = $request->uid;
-        //$api_token = Str::random(60);
-        try {
-            if($username != null && ($userStatus != 'not_authorized' || $userStatus != 'unKnown')){
-                $checkUsernameForFarmer = Farmer::where('username', $username)->get();
-                $checkUsernameForInvestor = Investor::where('username', $username)->get();
-                if($checkUsernameForInvestor->isEmpty() || $checkUsernameForFarmer->isEmpty() ){
-                    
-                    DB::table('farmers')->insertGetId([
-                        'username' => $username,
-                    ]);
-                    $checkUsernameForFarmer = Farmer::where('username', $username)->first();
-                    $api_token = Auth::guard('farmers')->login($checkUsernameForFarmer);
-                    $farmer = Farmer::where('username',$username)->first();
+        $validator = Validator::make($request->all(), [
+            'data' => 'required|array',
+            '*.type' => 'required|in:Farmer',
+            '*.attributes' => 'required|array',
+            '*.attributes.f_name' => 'required|string',
+            '*.attributes.l_name' => 'required|string',
+            '*.attributes.email' => 'required|email|unique:farmers',
+            '*.attributes.state' => 'required|string',
+            '*.attributes.status' => 'required|string',
+            '*.attributes.uid'=> 'required|string|unique:farmers',
+        ]);
+        
+        try {  
+            if ($validator->passes()) {
+                if($request->json('data.attributes.status') == "connected"){
+                    $userStatus = $request->status;
+                    $state = State::where('state', $request->json('data.attributes.state'))->first();
+                    $farmer = new Farmer;
+                    $farmer->first_name = $request->json('data.attributes.f_name');
+                    $farmer->uid = $request->json('data.attributes.uid'); // userId
+                    $farmer->lastname = $request->json('data.attributes.l_name');
+                    $farmer->email = $request->json('data.attributes.email');
+                    $farmer->state_id = $state->id;
+                    if($userStatus == 'connected'){
+                        $farmer->status = 'online';
+                    }else{
+                        $farmer->status = 'offline';
+                    };
+                    $farmer->save();
+                    $farmer = Farmer::where('uid', $request->json('data.attributes.uid'))->first();
+                    $api_token = Auth::guard('farmers')->login($farmer);
                     $farmer->api_token = $api_token;
                     $farmer->save();
                     
-                    return response()->json([
-                        'api_token' => $api_token,
-                        'message' => 'User Successfully Signup'], 200); // status code means user should continue since their data exist and valid
+                    return new FarmersResource($farmer);
+                    
+                    
                 }else{
-
-                    return response()->json(['Message' => 'You Already Exist as a Farmer or Investor'], 403); // user exist and forbidden to see the nextpage
+                    return \response()->json([
+                        "message" => "No authorize",
+                    ]);
                 }
-                
-            }else{
-                return response()->json(['Message' => 'You are not authorize by facebook'], 401); // status code means user should continue since their data exist and valid
-            }
+            } else {
+                return \response()->json(['errors' => $validator->errors()], 401);
+            }        
         } catch (Exception $e) {
             return response()->json(['Message' => 'Internal server Error'], 500);
-        }
 
+        }
     }
 
     /**
@@ -124,25 +120,18 @@ class FarmerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request)
+    public function show(Request $request, $id)
     // retrive a single farmer
     {
-        $uid = $request->uid;
-        $farmer  = Farmer::find($uid);
+        
         try {
-            
-            if($farmer != null){
-                return response()->json([
-                    'farmerData' => $farmer,
-                ], 200);
-            }else{
-                return response()->json([
-                    'Message' => 'Not found',
-                ], 401);
-            }
+            $farmer  = Farmer::find($id);
+            return new FarmersResource($farmer);
            
         } catch (Exception $e) {
+
             return response()->json(['Message' => 'Internal server Error'], 500);
+
         }
         
     }
@@ -176,19 +165,18 @@ class FarmerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request, $uid)
     {
         try{
-            $uid = $request->uid;
             $farmer = Farmer::find($uid);
             if($farmer != null){
                 $farmer->delete();
-                return response()->json(['Message' => 'Farmer successfully deleted'], 200);
+                return response()->json(['message' => 'Farmer successfully deleted'], 200);
             }else{
-                return response()->json(['Message' => 'Farmer does not exist'], 200);
+                return response()->json(['message' => 'Farmer does not exist'], 200);
             }
         }catch (Exception $e) {
-            return response()->json(['Message' => 'Internal server Error'], 500);
+            return response()->json(['message' => 'Internal server Error'], 500);
         }
     }
     public function listInvestor(Request $request)

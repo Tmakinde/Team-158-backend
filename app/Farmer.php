@@ -12,7 +12,7 @@ class Farmer extends Authenticatable implements JWTSubject
     ];
 
     public function investors(){
-        return $this->belongsTo(Investor::class);
+        return $this->belongsToMany(Investor::class);
     }
 
     public function getJWTIdentifier(){

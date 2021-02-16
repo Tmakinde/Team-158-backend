@@ -7,8 +7,12 @@ use DB;
 use Validator;
 use App\Investor;
 use App\Farmer;
+use App\State;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\InvestorResource;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\CreateInvestorRequest;
+use App\Http\Requests\CreateFarmerRequest;
 
 
 class InvestorController extends Controller
@@ -28,6 +32,13 @@ class InvestorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function index()
+    {
+        $investor = Investor::all();
+        return InvestorResource::collection($investor);
+    }
+
     public function create( Request $request )
     {
         try {
@@ -79,37 +90,53 @@ class InvestorController extends Controller
      */
     public function store(Request $request)
     {
-        // save username to database
-        $userStatus = $request->status;
-        $username = $request->uid;
-        try {
-            if($username != null && ($userStatus != 'not_authorized' || $userStatus != 'unKnown')){
-                $checkUsernameForFarmer = DB::table('farmers')->where('username', $username)->first();
-                $checkUsernameForInvestor = Investor::where('username', $username)->first();
-
-                if($checkUsernameForInvestor == null && $checkUsernameForFarmer == null){
-                    DB::table('investors')->insertGetId([
-                        'username' => $username,
-                    ]);
-                    $checkUsernameForInvestor = Investor::where('username', $username)->first();
-                    $api_token = Auth::guard('investors')->login($checkUsernameForInvestor);
-                    $investor = Investor::where('username',$username)->first();
+        $validator = Validator::make($request->all(), [
+            'data' => 'required|array',
+            '*.type' => 'required|in:Investor',
+            '*.attributes' => 'required|array',
+            '*.attributes.f_name' => 'required|string',
+            '*.attributes.l_name' => 'required|string',
+            '*.attributes.email' => 'required|email|unique:investors',
+            '*.attributes.state' => 'required|string',
+            '*.attributes.status' => 'required|string',
+            '*.attributes.uid'=> 'required|string|unique:investors',
+        ]);
+        try {  
+            if ($validator->passes()) {
+                if($request->json('data.attributes.status') == "connected"){
+                    $userStatus = $request->json('data.attributes.status');
+                    $state = State::where('state', $request->json('data.attributes.state'))->first();
+                    $investor = new Investor;
+                    $investor->first_name = $request->json('data.attributes.f_name');
+                    $investor->uid = $request->json('data.attributes.uid'); // userId
+                    $investor->lastname = $request->json('data.attributes.l_name');
+                    $investor->email = $request->json('data.attributes.email');
+                    $investor->state_id = $state->id;
+                    if($userStatus == 'connected'){
+                        $investor->status = 'online';
+                    }else{
+                        $investor->status = 'offline';
+                    };
+                    $investor->save();
+                    $investor = Investor::where('uid', $request->json('data.attributes.uid'))->first();
+                    $api_token = Auth::guard('investors')->login($investor);
                     $investor->api_token = $api_token;
                     $investor->save();
-                    return response()->json([
-                        'api_token' => $api_token,
-                        'message' => 'user successfully signup'], 200); // status code means user should continue since their data exist and valid
-                }else{
 
-                    return response()->json(['message' => 'You Already Exist as a Farmer or Investor'], 403); // user exist and forbidden to see the nextpage
+                    return new InvestorResource($investor);
+                }else{
+                    return \response()->json([
+                        "message" => "No authorize",
+                    ]);
                 }
-                
-                
             }else{
-                return response()->json(['message' => 'You are not authorize by facebook'], 401); // status code means user should continue since their data exist and valid
+                return \response()->json(['errors' => $validator->errors()], 401);
             }
+             
+                 
         } catch (Exception $e) {
-            return response()->json(['message' => 'Internal server Error'], 500);
+            return response()->json(['Message' => 'Internal server Error'], 500);
+
         }
 
     }
@@ -121,25 +148,17 @@ class InvestorController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function show(Request $request)
+    public function show(Request $request, $id)
     // retrive a single investor
     {
-        $uid = $request->uid;
-        $investor  = Investor::find($uid);
         try {
-            
-            if($investor != null){
-                return response()->json([
-                    'investorData' => $investor,
-                ], 200);
-            }else{
-                return response()->json([
-                    'Message' => 'Not found',
-                ], 401);
-            }
+            $investor  = Investor::find($id);
+            return new InvestorResource($investor);
            
-        } catch (\Throwable $th) {
+        } catch (Exception $e) {
+
             return response()->json(['Message' => 'Internal server Error'], 500);
+
         }
         
     }
@@ -174,38 +193,37 @@ class InvestorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request, $uid)
     {
         try{
-            $uid = $request->uid;
             $investor = Investor::find($uid);
             if($investor != null){
                 $investor->delete();
-                return response()->json(['Message' => 'Investor successfully deleted'], 200);
+                return response()->json(['message' => 'Investor successfully deleted'], 200);
             }else{
-                return response()->json(['Message' => 'Investor does not exist'], 200);
+                return response()->json(['message' => 'Investor does not exist'], 200);
             }
         }catch (Exception $e) {
-            return response()->json(['Message' => 'Internal server Error'], 500);
+            return response()->json(['message' => 'Internal server Error'], 500);
         }
     }
 
-    public function listFarmer(Request $request)
+    public function listFarmer(Request $request, $uid)
     {
         try{
-            $uid = $request->uid;
+            
             $investor = Investor::find($uid);
             if($investor != null){
-            $farmer = $investor->farmers;
+            $farmersUnderInvestor = $investor->farmers;
             return response()->json([
-                'Message' => $farmer
+                'data' => $farmersUnderInvestor,
             ], 200);
             }else{
-                return response()->json(['Message' => 'You do not have a farmer yet'], 200);
+                return response()->json(['message' => 'You do not have a farmer yet'], 200);
             }
 
         }catch (Exception $e) {
-            return response()->json(['Message' => 'Internal server Error'], 500);
+            return response()->json(['message' => 'Internal server Error'], 500);
         }
     }
     
